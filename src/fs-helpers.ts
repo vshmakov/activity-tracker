@@ -60,7 +60,7 @@ export function readFile(file: File): Promise<string> {
 /**
  * Reads the raw text from a file.
  */
-export function _readFileLegacy(file: File): Promise<string> {
+function _readFileLegacy(file: File): Promise<string> {
     return new Promise((resolve) => {
         const reader = new FileReader();
         reader.addEventListener('loadend', (e) => {
