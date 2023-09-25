@@ -21,8 +21,8 @@ export function getNewFileHandle(): Promise<FileSystemFileHandle> {
     if ('showSaveFilePicker' in window) {
         const options = {
             types: [{
-                description: 'Text file',
-                accept: {'text/plain': ['.txt']},
+                description: 'json file',
+                accept: {'application/json': ['.json']},
             }],
         };
 
@@ -34,9 +34,9 @@ export function getNewFileHandle(): Promise<FileSystemFileHandle> {
     const options = {
         type: 'save-file',
         accepts: [{
-            description: 'Text file',
-            extensions: ['txt'],
-            mimeTypes: ['text/plain'],
+            description: 'json file',
+            extensions: ['json'],
+            mimeTypes: ['application/json'],
         }],
     };
 
