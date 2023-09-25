@@ -1,15 +1,10 @@
 import React from 'react';
+import {ToDoList} from "./ToDo/ToDoList";
 
-function App() {
+export function App() {
     return (
         <div>
-            <ul>
-                <li>1</li>
-                <li>2</li>
-                <li>3</li>
-            </ul>
+            <ToDoList/>
         </div>
     );
 }
-
-export default App;
