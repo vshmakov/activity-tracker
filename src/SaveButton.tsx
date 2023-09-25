@@ -6,7 +6,7 @@ import {observer} from "mobx-react";
 export const SaveButton = observer(({state}: WithState) => {
     return (
         <div>
-            <button onClick={() => state.save()}>
+            <button onClick={() => state.createNewFile()}>
                 Save
             </button>
         </div>

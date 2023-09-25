@@ -5,6 +5,7 @@ import {getNewFileHandle, writeFile} from "./fs-helpers";
 
 export class State {
     public toDos: ToDo[] = []
+    public currentFile: FileSystemFileHandle | null = null
 
     constructor() {
         makeAutoObservable(this)
@@ -14,12 +15,12 @@ export class State {
         )
     }
 
-    public async save(): Promise<void> {
+    public async createNewFile(): Promise<void> {
         try {
-            const fileHandle = await getNewFileHandle()
+            const file = await getNewFileHandle()
 
             try {
-                await writeFile(fileHandle, 'sample text');
+                await writeFile(file, this.serializeContent());
             } catch (exception) {
                 const message = 'Unable to save file.';
                 console.error(message, exception);
@@ -27,6 +28,8 @@ export class State {
 
                 return;
             }
+
+            this.currentFile = file
         } catch (exception) {
             if (exception instanceof DOMException && exception.name === 'AbortError') {
                 return;
@@ -38,5 +41,13 @@ export class State {
 
             return
         }
+    }
+
+    private serializeContent():string {
+        return JSON.stringify(this.toDos, null, 2)
+    }
+
+    private readFile(file: FileSystemFileHandle): void {
+        this.currentFile = file
     }
 }
