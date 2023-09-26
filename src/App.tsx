@@ -2,12 +2,12 @@ import React from 'react';
 import {ToDoList} from "./ToDo/ToDoList";
 import {WithState} from "./WithState";
 import {observer} from "mobx-react";
-import {SaveButton} from "./SaveButton";
+import {ChooseSource} from "./ChooseSource";
 
 export const App = observer(({state}: WithState) => {
     return (
         <div>
-            <SaveButton state={state}/>
+            <ChooseSource state={state}/>
             <ToDoList state={state}/>
         </div>
     );
