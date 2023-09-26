@@ -5,11 +5,11 @@ import {observer} from "mobx-react";
 export const SelectFile = observer(({state}: WithState) => {
     return (
         <div>
-            {state.currentFile !== null ?
-                (<button onClick={() => state.readCurrentFile()}>
-                        {state.currentFile?.name}
-                    </button>
-                ) : null}
+            {state.recentFiles.map(file => (
+                <button onClick={() => state.readFile(file)}>
+                    {file.name}
+                </button>
+            ))}
             <button onClick={() => state.createNewFile()}>
                 Create new file
             </button>

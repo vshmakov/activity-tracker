@@ -36,17 +36,19 @@ export class State {
             return;
         }
 
-        this.updateRecents(file);
+        this.addRecentFile(file);
     };
 
-    private updateRecents(file: FileSystemFileHandle): void {
-        this.recentFiles.unshift(file);
+    private addRecentFile(file: FileSystemFileHandle): void {
+        const recentFiles = this.recentFiles
+        recentFiles.unshift(file);
 
-        if (this.recentFiles.length > 5) {
-            this.recentFiles.pop();
+        while (recentFiles.length > 1) {
+            recentFiles.pop();
         }
 
-        this.indexDBConnection.set(IndexDBKey.RecentFiles, toJS(this.recentFiles))
+        this.setRecentFiles(recentFiles)
+        this.indexDBConnection.set(IndexDBKey.RecentFiles, toJS(recentFiles))
     }
 
     private setRecentFiles(recentFiles: FileSystemFileHandle[]): void {
@@ -90,21 +92,18 @@ export class State {
         return JSON.stringify(this.toDos, null, 2)
     }
 
-    public async readCurrentFile(): Promise<void> {
-        if (null === this.currentFile) {
-            return
-        }
-
-        if (!await verifyPermission(this.currentFile, true)) {
+    public async readFile(file: FileSystemFileHandle): Promise<void> {
+        if (!await verifyPermission(file, true)) {
             return
         }
 
         const toDos = JSON.parse(
             await readFile(
-                await this.currentFile.getFile()
+                await file.getFile()
             )
         )
         this.setToDos(toDos)
+        this.setCurrentFile(file)
     }
 
     private setToDos(toDos: ToDo[]): void {
