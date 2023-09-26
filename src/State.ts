@@ -1,6 +1,6 @@
 import {makeAutoObservable} from "mobx";
 import {ToDo} from "./ToDo/ToDo";
-import {getNewFileHandle, writeFile} from "./fs-helpers";
+import {getNewFileHandle, readFile, verifyPermission, writeFile} from "./fs-helpers";
 import {createIDB} from "./idb-keyval-iife";
 import {IndexDBKey} from "./IndexDBKey";
 import {IndexDBConnection} from "./IndexDBConnection";
@@ -61,7 +61,24 @@ export class State {
         return JSON.stringify(this.toDos, null, 2)
     }
 
-    public readCurrentFile(): void {
+    public async readCurrentFile(): Promise<void> {
+        if (null === this.currentFile) {
+            return
+        }
 
+        if (!await verifyPermission(this.currentFile, true)) {
+            return
+        }
+
+        const toDos = JSON.parse(
+            await readFile(
+                await this.currentFile.getFile()
+            )
+        )
+        this.setToDos(toDos)
+    }
+
+    private setToDos(toDos: ToDo[]): void {
+        this.toDos = toDos
     }
 }
