@@ -67,7 +67,7 @@ export class State {
                 return;
             }
 
-            this.currentFile = file
+            this.setCurrentFile(file);
             this.addRecent(file)
         } catch (exception) {
             if (exception instanceof DOMException && exception.name === 'AbortError') {
@@ -80,6 +80,10 @@ export class State {
 
             return
         }
+    }
+
+    private setCurrentFile(file: FileSystemFileHandle): void {
+        this.currentFile = file
     }
 
     private serializeContent(): string {
