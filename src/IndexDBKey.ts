@@ -1,3 +1,3 @@
 export enum IndexDBKey {
-    CurrentFile = 'current_file',
+    RecentFiles = 'recent_files',
 }

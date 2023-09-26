@@ -1,9 +1,8 @@
 import React from 'react';
-import {ToDoList} from "./ToDo/ToDoList";
 import {WithState} from "./WithState";
 import {observer} from "mobx-react";
 
-export const ChooseSource = observer(({state}: WithState) => {
+export const SelectFile = observer(({state}: WithState) => {
     return (
         <div>
             {state.currentFile !== null ?

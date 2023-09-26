@@ -1,4 +1,4 @@
-import {makeAutoObservable} from "mobx";
+import {makeAutoObservable, toJS} from "mobx";
 import {ToDo} from "./ToDo/ToDo";
 import {getNewFileHandle, readFile, verifyPermission, writeFile} from "./fs-helpers";
 import {createIDB} from "./idb-keyval-iife";
@@ -8,6 +8,7 @@ import {IndexDBConnection} from "./IndexDBConnection";
 export class State {
     public toDos: ToDo[] = []
     public currentFile: FileSystemFileHandle | null = null
+    public recentFiles: FileSystemFileHandle[] = []
     private indexDBConnection: IndexDBConnection
 
     public constructor() {
@@ -17,15 +18,39 @@ export class State {
             new ToDo('Wash my car')
         )
         this.indexDBConnection = createIDB() as IndexDBConnection
-        this.usePreviousFile()
+        this.getRecentFiles()
     }
 
-    private async usePreviousFile(): Promise<void> {
-        this.setCurrentFile(await this.indexDBConnection.get(IndexDBKey.CurrentFile) || null)
+    private async getRecentFiles(): Promise<void> {
+        this.setRecentFiles(await this.indexDBConnection.get(IndexDBKey.RecentFiles) || [])
     }
 
-    private setCurrentFile(currentFile: FileSystemFileHandle | null): void {
-        this.currentFile = currentFile
+    private async addRecent(file: FileSystemFileHandle): Promise<void> {
+        if (!file.isSameEntry) {
+            return;
+        }
+
+        const inList = await Promise.all(this.recentFiles.map((f) => file.isSameEntry(f)));
+
+        if (inList.some((val) => val)) {
+            return;
+        }
+
+        this.updateRecents(file);
+    };
+
+    private updateRecents(file: FileSystemFileHandle): void {
+        this.recentFiles.unshift(file);
+
+        if (this.recentFiles.length > 5) {
+            this.recentFiles.pop();
+        }
+
+        this.indexDBConnection.set(IndexDBKey.RecentFiles, toJS(this.recentFiles))
+    }
+
+    private setRecentFiles(recentFiles: FileSystemFileHandle[]): void {
+        this.recentFiles = recentFiles
     }
 
     public async createNewFile(): Promise<void> {
@@ -43,7 +68,7 @@ export class State {
             }
 
             this.currentFile = file
-            this.indexDBConnection.set(IndexDBKey.CurrentFile, this.currentFile)
+            this.addRecent(file)
         } catch (exception) {
             if (exception instanceof DOMException && exception.name === 'AbortError') {
                 return;
